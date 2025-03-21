@@ -4,26 +4,27 @@
   </div>
 </div>
 
-<form>
+<form [formGroup]="form">
   <div class="row mb-2">
     <div class="col">
       <label for="username" class="form-label">Username</label>
-      <input type="text" id="username" class="form-control" placeholder="Registered username">
+      <input type="text" id="username" formControlName="username" class="form-control" placeholder="Registered username">
     </div>
   </div>
   <div class="row mb-2">
     <div class="col">
       <label for="password" class="form-label">Password</label>
-      <input type="password" id="password" class="form-control" placeholder="Valid password">
+      <input type="password" id="password" formControlName="password" class="form-control" placeholder="Valid password">
     </div>
   </div>
   <div class="row mb-5">
     <div class="col">
       <div class="d-flex justify-content-between">
-        <button type="button" class="btn btn-danger">
+        <button type="button" class="btn btn-danger" (click)="resetForm()">
           Start Over
         </button>
-        <button type="submit" class="btn btn-primary">Confirm</button>
+        <button type="submit" class="btn btn-primary" (click)="sendOrder()"
+          [disabled]="(totalCost$ | async) === 0 || form.invalid">Confirm</button>
       </div>
     </div>
   </div>
@@ -34,6 +35,8 @@
     <h2>Your Order</h2>
   </div>
 </div>
+
+
 <div class="row">
   <div class="col">
     <table class="table table-striped">
@@ -47,18 +50,21 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td> 1 </td>
-          <td> XXX </td>
-          <td> $10 </td>
-          <td> XXX </td>
-          <td> $10 </td>
-        </tr>
+        @for (item of orders$ | async; let i = $index; track item) {
+          <tr>
+            <td> {{i}} </td>
+            <td> {{item.name}} </td>
+            <td> ${{item.price | number:'1.2-2'}} </td>
+            <td> {{item.quantity}} </td>
+            <td> ${{item.quantity * item.price | number:'1.2-2'}} </td>
+          </tr>
+  
+        }
       </tbody>
       <tfoot>
         <tr>
           <td colspan="4"></td>
-          <td> $10 </td>
+          <td> ${{totalCost$ | async | number:'1.2-2'}} </td>
         </tr>
       </tfoot>
 
