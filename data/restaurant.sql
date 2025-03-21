@@ -11,7 +11,6 @@ create table customers (
   username varchar(64) not null,
   password varchar(128) not null,
   
-  constraint pk_username primary key(username)
 );
 
 insert into customers(username, password) values
@@ -31,7 +30,6 @@ create table place_orders (
   username varchar(255) not null,
 
   constraint pk_oid primary key(order_id),
-  constraint fk_username foreign key(username) references customers(username),
   unique (payment_id)
 );
 
