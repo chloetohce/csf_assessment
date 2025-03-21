@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { RestaurantService } from '../restaurant.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-confirmation',
@@ -7,7 +9,12 @@ import { Component } from '@angular/core';
   styleUrl: './confirmation.component.css'
 })
 export class ConfirmationComponent {
-
   // TODO: Task 5
+  private service = inject(RestaurantService)
 
+  protected successfulPayment$ = this.service.successfulPayment$;
+  
+  backToMenu() {
+    this.service.reset()
+  }
 }

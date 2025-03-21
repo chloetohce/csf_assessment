@@ -1,5 +1,7 @@
 package vttp.batch5.csf.assessment.server.repositories;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.bson.Document;
@@ -10,7 +12,12 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import com.mongodb.BasicDBObject;
+
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
 import vttp.batch5.csf.assessment.server.model.MenuItem;
+import vttp.batch5.csf.assessment.server.model.PaymentResponse;
 
 
 @Repository
@@ -51,5 +58,39 @@ public class OrdersRepository {
   // Write the native MongoDB query for your access methods in the comment below
   //
   //  Native MongoDB query here
+  /*
+   *  db.orders.insert({
+   *    _id: <order_id>,
+   *    order_id: <order_id>,
+   *    payment_id: <payment id>,
+   *    username: <username>,
+   *    total: <total>,
+   *    timestamp: <date>,
+   *    items: [
+   *      {id: <id>, price: <price>, quantity: <qty>}, ...
+   *    ]
+   *  })
+   */
+  public void saveOrders(JsonObject order, double total, PaymentResponse payment) {
+    Document toInsert = new Document()
+      .append("_id", payment.getOrderId())
+      .append(("order_id"), payment.getOrderId())
+      .append("payment_id", payment.getPaymentId())
+      .append("username", order.getString("username"))
+      .append("total", total)
+      .append("timestamp", new Date(payment.getTimestamp()))
+      .append("items", convertToList(order.getJsonArray("items")));
+    mongoTemplate.insert(toInsert, "orders");
+  }
+
+  private List<BasicDBObject> convertToList(JsonArray items) {
+    List<BasicDBObject> list = new ArrayList<>();
+    for (int i = 0; i < items.size(); i++) {
+      JsonObject item = items.getJsonObject(i);
+      BasicDBObject object = BasicDBObject.parse(item.toString());
+      list.add(object);
+    }
+    return list;
+  }
   
 }

@@ -1,22 +1,27 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { inject, Injectable, OnDestroy, OnInit } from "@angular/core";
-import { MenuItem, OrderItem } from "./models";
-import { BehaviorSubject, Observable, Subscription } from "rxjs";
+import { MenuItem, OrderItem, PaymentResponse } from "./models";
+import { BehaviorSubject, Observable, Subject, Subscription } from "rxjs";
+import { Router } from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
 })
 export class RestaurantService implements OnInit, OnDestroy {
   private http = inject(HttpClient);
+  private router = inject(Router)
+  
   private orders = new BehaviorSubject<MenuItem[]>([])
   private qty = new BehaviorSubject<number>(0);
   private totalCost = new BehaviorSubject<number>(0);
+  private successfulPayment = new BehaviorSubject<PaymentResponse | undefined>(undefined)
   private qtySub!: Subscription
   private totalSub!: Subscription
 
   orders$: Observable<MenuItem[]> = this.orders.asObservable()
   qty$: Observable<number> = this.qty.asObservable()
   totalCost$: Observable<number> = this.totalCost.asObservable()
+  successfulPayment$ = this.successfulPayment.asObservable();
 
   constructor() {
     this.qtySub = this.orders$.subscribe(orders =>
@@ -88,14 +93,17 @@ export class RestaurantService implements OnInit, OnDestroy {
       }) as OrderItem)
     }
     console.log(payload)
-    return this.http.post('/api/food_order', payload, {
+    return this.http.post<PaymentResponse>('/api/food_order', payload, {
       headers: new HttpHeaders()
         .append('Content-Type', 'application/json')
         .append('Accept', 'application/json')
     })
       .subscribe({
-        next: msg => console.log(msg),
-        error: err => console.log(err)
+        next: (msg) => {
+          this.router.navigate(['/confirmation'])
+          this.successfulPayment.next(msg)
+        },
+        error: (err) => alert(err.error.message)
       })
   }
 

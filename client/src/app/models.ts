@@ -12,3 +12,10 @@ export interface OrderItem {
     price: number,
     quantity: number
 }
+
+export interface PaymentResponse {
+    orderId: string,
+    paymentId: string, 
+    total: number,
+    timestamp: number
+}

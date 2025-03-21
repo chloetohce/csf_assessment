@@ -35,7 +35,11 @@ public class RestaurantController {
   @PostMapping(path="/food_order", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> postFoodOrder(@RequestBody String payload) {
     try {
-      service.saveOrder(payload);
+      JsonObject receipt = service.saveOrder(payload);
+
+      System.out.println(receipt.toString());
+
+      return ResponseEntity.ok(receipt.toString());
     } catch (InvalidUserException e) {
       JsonObject message = Json.createObjectBuilder()
         .add("message", e.getMessage())
@@ -50,6 +54,5 @@ public class RestaurantController {
       return ResponseEntity.status(500)
         .body(message.toString());
     }
-    return ResponseEntity.ok("{}");
   }
 }

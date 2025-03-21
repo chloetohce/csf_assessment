@@ -31,10 +31,10 @@ public class RestaurantService {
   @Autowired
   private RestaurantRepository restaurantRepository;
 
-  private RestTemplate restTemplate = new RestTemplate();
+  private final RestTemplate restTemplate = new RestTemplate();
 
-  private static String URL_PAYMENT = "https://payment-service-production-a75a.up.railway.app/api/payment";
-  private static String PAYEE = "Toh Cyn Ee Chloe";
+  private static final String URL_PAYMENT = "https://payment-service-production-a75a.up.railway.app/api/payment";
+  private static final String PAYEE = "Toh Cyn Ee Chloe";
 
   // TODO: Task 2.2
   // You may change the method's signature
@@ -55,19 +55,23 @@ public class RestaurantService {
   }
 
   // TODO: Task 4
-  public void saveOrder(String payload) {
+  public JsonObject saveOrder(String payload) {
     JsonReader reader = Json.createReader(new StringReader(payload));
     JsonObject entity = reader.readObject();
     String username = entity.getString("username");
     String password = entity.getString("password");
     JsonArray items = entity.getJsonArray("items");
+    double total = calculateTotal(items);
     String orderId = UUID.randomUUID().toString().substring(0, 8);
     
     boolean isUserVerified = verifyUser(username, password);
 
-    PaymentResponse payment = processPayment(orderId, username, calculateTotal(items));
+    PaymentResponse payment = processPayment(orderId, username, total);
 
-    restaurantRepository.saveOrderPaymentDetails(entity, calculateTotal(items), payment);
+    restaurantRepository.saveOrderPaymentDetails(entity, total, payment);
+    ordersRepository.saveOrders(entity, total, payment);
+
+    return payment.toJson();
   }
 
   private boolean verifyUser(String username, String password) {
