@@ -31,7 +31,7 @@ WORKDIR /app
 
 COPY --from=javabuild /server/target/server-0.0.1-SNAPSHOT.jar app.jar
 
-ENV PORT=8080
+ENV PORT=3000
 
 EXPOSE ${PORT}
 
