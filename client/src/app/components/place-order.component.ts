@@ -25,7 +25,6 @@ export class PlaceOrderComponent implements OnInit {
   }
 
   protected sendOrder() {
-    console.log(this.form.value)
     this.service.sendOrder(this.form.get('username')?.value, this.form.get('password')?.value)
   }
 

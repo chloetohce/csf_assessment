@@ -63,7 +63,7 @@ public class RestaurantService {
     JsonArray items = entity.getJsonArray("items");
     double total = calculateTotal(items);
     String orderId = UUID.randomUUID().toString().substring(0, 8);
-    
+
     boolean isUserVerified = verifyUser(username, password);
 
     PaymentResponse payment = processPayment(orderId, username, total);

@@ -27,7 +27,7 @@ export class MenuComponent implements OnInit {
 
   getItemQuantity(id: string) {
     return this.orders$.pipe(
-      map(orders => orders.find(i => i.id === id)?.quantity ?? 0)
+      map(orders => orders.find(i => i.id === id)?.quantity)
     )
   }
 

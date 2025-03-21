@@ -37,15 +37,17 @@ public class RestaurantController {
     try {
       JsonObject receipt = service.saveOrder(payload);
 
-      System.out.println(receipt.toString());
-
       return ResponseEntity.ok(receipt.toString());
+
+
     } catch (InvalidUserException e) {
       JsonObject message = Json.createObjectBuilder()
         .add("message", e.getMessage())
         .build();
       return ResponseEntity.status(401)
         .body(message.toString());
+
+
     } catch (Exception e) {
       System.out.println(e.getMessage());
       JsonObject message = Json.createObjectBuilder()
